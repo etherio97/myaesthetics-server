@@ -27,7 +27,7 @@ export class DashboardController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'manager')
   @Get('monthly-statistics')
   getMonthlyStatistics(
     @Query('startDate') startDate: string,
