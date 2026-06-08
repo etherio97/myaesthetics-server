@@ -14,6 +14,8 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logging/logging.interceptor';
 import { MemberModule } from './orm/member/member.module';
 import { MemberApiModule } from './api/member-api/member-api.module';
+import { ExpenseApiModule } from './api/expense-api/expense-api.module';
+import { ExpenseModule } from './orm/expense/expense.module';
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { MemberApiModule } from './api/member-api/member-api.module';
     ItemModule,
     ReceiptModule,
     MemberModule,
+    ExpenseModule,
 
     /* API Modules */
     AuthModule,
@@ -44,6 +47,7 @@ import { MemberApiModule } from './api/member-api/member-api.module';
     ItemApiModule,
     ReceiptApiModule,
     MemberApiModule,
+    ExpenseApiModule,
 
     /* Other Modules */
     SharedModule,

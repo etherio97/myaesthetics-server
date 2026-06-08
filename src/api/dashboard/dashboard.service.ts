@@ -25,6 +25,36 @@ export class DashboardService {
       .then((res) => res[0]);
   }
 
+  async getTotalRevenueCash(startDate: string, endDate: string) {
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo
+      .query(
+        `SELECT COALESCE(SUM(grand_total), 0) AS total_revenue_cash 
+        FROM receipts WHERE date BETWEEN $1 AND $2 
+        AND status = 'Active'
+        AND payment_method = 'Cash'`,
+        [startDate, endDate],
+      )
+      .then((res) => res[0]);
+  }
+
+  async getTotalRevenueOther(startDate: string, endDate: string) {
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo
+      .query(
+        `SELECT COALESCE(SUM(grand_total), 0) AS total_revenue_other
+        FROM receipts WHERE date BETWEEN $1 AND $2 
+        AND status = 'Active'
+        AND payment_method != 'Cash'`,
+        [startDate, endDate],
+      )
+      .then((res) => res[0]);
+  }
+
   async getTotalDiscount(startDate: string, endDate: string) {
     startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
     endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
@@ -32,20 +62,6 @@ export class DashboardService {
     return this.repo
       .query(
         `SELECT COALESCE(SUM(discount_amount), 0) AS total_discount 
-        FROM receipts WHERE date BETWEEN $1 AND $2 
-        AND status = 'Active'`,
-        [startDate, endDate],
-      )
-      .then((res) => res[0]);
-  }
-
-  async getAverageRevenuePerPatient(startDate: string, endDate: string) {
-    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
-    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
-
-    return this.repo
-      .query(
-        `SELECT COALESCE(AVG(grand_total), 0) AS avg_per_patient
         FROM receipts WHERE date BETWEEN $1 AND $2 
         AND status = 'Active'`,
         [startDate, endDate],
@@ -81,5 +97,57 @@ export class DashboardService {
         [startDate, endDate],
       )
       .then((res) => res[0]);
+  }
+
+  async getCustomerCountByDate(startDate: string, endDate: string) {
+    let query = `SELECT "date"::DATE AS "label", COUNT(DISTINCT customer_name) AS "value"
+        FROM receipts
+        WHERE "date" between $1 and $2 and status = 'Active'
+        GROUP BY "date"::DATE
+        ORDER BY "label" DESC`;
+
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo.query(query, [startDate, endDate]);
+  }
+
+  async getTotalRevenueByDate(startDate: string, endDate: string) {
+    let query = `SELECT "date"::DATE AS "label", SUM(grand_total) AS "value"
+        FROM receipts
+        WHERE "date" between $1 and $2 and status = 'Active'
+        GROUP BY "date"::DATE
+        ORDER BY "label" DESC`;
+
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo.query(query, [startDate, endDate]);
+  }
+
+  async getCustomerCountByHour(startDate: string, endDate: string) {
+    let query = `SELECT date_trunc('hour', "date") AS "label", COUNT(DISTINCT customer_name) AS "value"
+        FROM receipts
+        WHERE "date" between $1 and $2 and status = 'Active'
+        GROUP BY "label"
+        ORDER BY "label" ASC`;
+
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo.query(query, [startDate, endDate]);
+  }
+
+  async getTotalRevenueByHour(startDate: string, endDate: string) {
+    let query = `SELECT date_trunc('hour', "date") AS "label", SUM(grand_total) AS "value"
+        FROM receipts
+        WHERE "date" between $1 and $2 and status = 'Active'
+        GROUP BY "label"
+        ORDER BY "label" ASC`;
+
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo.query(query, [startDate, endDate]);
   }
 }
