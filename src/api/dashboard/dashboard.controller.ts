@@ -21,8 +21,17 @@ export class DashboardController {
       this.dashboardService.getTotalFacialRevenue(startDate, endDate),
       this.dashboardService.getTotalRevenueCash(startDate, endDate),
       this.dashboardService.getTotalRevenueOther(startDate, endDate),
+      this.dashboardService.getTotalExpenses(startDate, endDate),
     ])
-      .then(([a, b, c, d, e, f]) => ({ ...a, ...b, ...c, ...d, ...e, ...f }))
+      .then(([a, b, c, d, e, f, g]) => ({
+        ...a,
+        ...b,
+        ...c,
+        ...d,
+        ...e,
+        ...f,
+        ...g,
+      }))
       .catch((e) => ({ error: 'Unexpected Error' }));
   }
 

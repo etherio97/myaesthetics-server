@@ -84,6 +84,19 @@ export class DashboardService {
       .then((res) => res[0]);
   }
 
+  async getTotalExpenses(startDate: string, endDate: string) {
+    startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
+    endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
+
+    return this.repo
+      .query(
+        `SELECT COALESCE(SUM(amount), 0) AS total_expenses
+        FROM expenses WHERE date BETWEEN $1 AND $2`,
+        [startDate, endDate],
+      )
+      .then((res) => res[0]);
+  }
+
   async getTotalFacialRevenue(startDate: string, endDate: string) {
     startDate = moment(startDate).format('yyyy-MM-DDT00:00:00.000Z');
     endDate = moment(endDate).format('yyyy-MM-DDT23:59:59.999Z');
